@@ -1,27 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Gestión Académica</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .menu-section { 
-            margin-bottom: 30px; 
-            padding: 15px;
-            background-color: #f5f5f5;
-            border-radius: 5px;
-        }
-        h2 { color: #333; }
-        .menu-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
-        button { 
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-        }
-        button:hover { background-color: #0056b3; }
-    </style>
+    <link rel="stylesheet" href="assets/css/estilos.css">
 </head>
 <body>
     <h1>Sistema de Gestión Académica</h1>
@@ -63,3 +46,4 @@
     </div>
 </body>
 </html>
+
