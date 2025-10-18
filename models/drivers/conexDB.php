@@ -1,11 +1,10 @@
 <?php
-
 namespace app\models\drivers;
 
 use mysqli;
 
 class conexDB {
-    private $conn =null;
+    private $conn = null;
 
     public function __construct() {
         $this->conn = new mysqli("localhost", "root", "", "notas_app");

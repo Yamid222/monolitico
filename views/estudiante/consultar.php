@@ -1,34 +1,42 @@
 <?php
-require_once "../../config/database.php";
-require_once "../../controllers/EstudianteController.php";
-
-$database = new Database();
-$db = $database->conectar();
-$controller = new EstudianteController($db);
-$estudiantes = $controller->consultar();
+require_once __DIR__ . '/../../controllers/estudianteController.php';
+$controller = new EstudianteController();
+$estudiantes = $controller->listar();
 ?>
 
-<h2>Listado de Estudiantes</h2>
-<a href="registrar.php">➕ Nuevo Estudiante</a>
-<table border="1" cellpadding="5">
-    <tr>
-        <th>Código</th>
-        <th>Nombre</th>
-        <th>Correo</th>
-        <th>Programa</th>
-        <th>Acciones</th>
-    </tr>
-    <?php foreach($estudiantes as $e): ?>
-    <tr>
-        <td><?= $e['codigo'] ?></td>
-        <td><?= $e['nombre'] ?></td>
-        <td><?= $e['correo'] ?></td>
-        <td><?= $e['id_programa'] ?></td>
-        <td>
-            <a href="editar.php?id=<?= $e['id_estudiante'] ?>">✏️ Editar</a> |
-            <a href="eliminar.php?id=<?= $e['id_estudiante'] ?>"
-               onclick="return confirm('¿Seguro que deseas eliminar este estudiante?')">🗑️ Eliminar</a>
-        </td>
-    </tr>
-    <?php endforeach; ?>
-</table>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Consultar Estudiantes</title>
+</head>
+<body>
+    <h1>Lista de Estudiantes</h1>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Programa</th>
+            <th>Acciones</th>
+        </tr>
+
+        <?php foreach ($estudiantes as $fila): ?>
+            <tr>
+                <td><?= $fila['codigo'] ?></td>
+                <td><?= $fila['nombre'] ?></td>
+                <td><?= $fila['correo'] ?></td>
+                <td><?= $fila['id_programa'] ?></td>
+                <td>
+                    <a href="editar.php?codigo=<?= $fila['codigo'] ?>">✏️ Editar</a> |
+                    <a href="eliminar.php?codigo=<?= $fila['codigo'] ?>"
+                       onclick="return confirm('¿Seguro que deseas eliminar este estudiante?');">
+                       🗑️ Eliminar
+                    </a>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
+</body>
+</html>

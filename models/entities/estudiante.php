@@ -1,107 +1,72 @@
 <?php
+namespace app\models\entities;
+
+use app\models\drivers\conexDB;
+
+require_once __DIR__ . '/../drivers/conexDB.php';
+
 class Estudiante {
     private $conn;
-    private $tabla = "estudiante";
+    private $tabla = "estudiantes";
 
-    public $id_estudiante;
-    public $codigo;
-    public $nombre;
-    public $correo;
-    public $id_programa;
-
-    public function __construct($db) {
-        $this->conn = $db;
+    public function __construct() {
+        $db = new conexDB();
+        $this->conn = $db->getConexion();
     }
 
-    // 🔹 Consultar todos los estudiantes
+    // Consultar todos los estudiantes
     public function listar() {
-        $query = "SELECT * FROM " . $this->tabla;
-        return $this->conn->query($query);
+        $sql = "SELECT e.codigo, e.nombre, e.email, p.nombre AS programa
+                FROM estudiantes e
+                JOIN programas p ON e.programa = p.codigo";
+        return $this->conn->query($sql);
     }
 
-    // 🔹 Registrar estudiante
-    public function crear() {
-        $query = "INSERT INTO " . $this->tabla . " (codigo, nombre, correo, id_programa)
-                  VALUES (:codigo, :nombre, :correo, :id_programa)";
-        $stmt = $this->conn->prepare($query);
-
-        $stmt->bindParam(":codigo", $this->codigo);
-        $stmt->bindParam(":nombre", $this->nombre);
-        $stmt->bindParam(":correo", $this->correo);
-        $stmt->bindParam(":id_programa", $this->id_programa);
-
+    // Registrar nuevo estudiante
+    public function registrar($codigo, $nombre, $email, $programa) {
+        $stmt = $this->conn->prepare("INSERT INTO estudiantes (codigo, nombre, email, programa)
+                                    VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $codigo, $nombre, $email, $programa);
         return $stmt->execute();
     }
 
-    // 🔹 Buscar estudiante por ID
-    public function obtenerPorId($id) {
-        $query = "SELECT * FROM " . $this->tabla . " WHERE id_estudiante = :id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":id", $id);
+    // Verificar si el estudiante tiene notas
+    private function tieneNotas($codigo) {
+        $stmt = $this->conn->prepare("SELECT COUNT(*) AS total FROM notas WHERE estudiante = ?");
+        $stmt->bind_param("s", $codigo);
         $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $res = $stmt->get_result()->fetch_assoc();
+        return $res['total'] > 0;
     }
 
-    // 🔹 Modificar estudiante
-    public function tieneNotas() {
-        $query = "SELECT COUNT(*) FROM nota WHERE id_estudiante = :id_estudiante";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":id_estudiante", $this->id_estudiante);
-        $stmt->execute();
-        return $stmt->fetchColumn() > 0;
-    }
-
-    public function actualizar() {
-        // Verificar si el estudiante tiene notas registradas
-        if ($this->tieneNotas()) {
-            return false;
+    // Actualizar estudiante
+    public function actualizar($codigo, $nombre, $email) {
+        if ($this->tieneNotas($codigo)) {
+            return "❌ No se puede modificar. El estudiante tiene notas registradas.";
         }
-
-        $query = "UPDATE " . $this->tabla . "
-                  SET nombre = :nombre, correo = :correo, id_programa = :id_programa
-                  WHERE id_estudiante = :id_estudiante";
-        $stmt = $this->conn->prepare($query);
-
-        $stmt->bindParam(":nombre", $this->nombre);
-        $stmt->bindParam(":correo", $this->correo);
-        $stmt->bindParam(":id_programa", $this->id_programa);
-        $stmt->bindParam(":id_estudiante", $this->id_estudiante);
-
-        return $stmt->execute();
+        $stmt = $this->conn->prepare("UPDATE estudiantes SET nombre=?, email=? WHERE codigo=?");
+        $stmt->bind_param("sss", $nombre, $email, $codigo);
+        $stmt->execute();
+        return "✅ Estudiante actualizado correctamente.";
     }
 
-    // 🔹 Eliminar estudiante
-    public function eliminar() {
-        // Verificar si el estudiante tiene notas registradas
-        if ($this->tieneNotas()) {
-            return false;
+    // Eliminar estudiante
+    public function eliminar($codigo) {
+        if ($this->tieneNotas($codigo)) {
+            return "❌ No se puede eliminar. El estudiante tiene notas registradas.";
         }
-
-        $query = "DELETE FROM " . $this->tabla . " WHERE id_estudiante = :id_estudiante";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":id_estudiante", $this->id_estudiante);
-        return $stmt->execute();
+        $stmt = $this->conn->prepare("DELETE FROM estudiantes WHERE codigo=?");
+        $stmt->bind_param("s", $codigo);
+        $stmt->execute();
+        return "✅ Estudiante eliminado correctamente.";
     }
 
-    // Buscar estudiante por código (clave natural)
-    public function obtenerPorCodigo($codigo) {
-        $query = "SELECT * FROM " . $this->tabla . " WHERE codigo = :codigo";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":codigo", $codigo);
+    // Buscar estudiante por código
+    public function buscarPorCodigo($codigo) {
+        $stmt = $this->conn->prepare("SELECT * FROM estudiantes WHERE codigo=?");
+        $stmt->bind_param("s", $codigo);
         $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    // Listar estudiantes por el código de programa (join con tabla programa)
-    public function listarPorProgramaCodigo($codigo_programa) {
-        $query = "SELECT e.* FROM " . $this->tabla . " e
-                  JOIN programa p ON e.id_programa = p.id_programa
-                  WHERE p.codigo = :codigo
-                  ORDER BY e.nombre";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":codigo", $codigo_programa);
-        $stmt->execute();
-        return $stmt;
+        return $stmt->get_result()->fetch_assoc();
     }
 }
 ?>

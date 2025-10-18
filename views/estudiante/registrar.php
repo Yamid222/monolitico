@@ -1,33 +1,51 @@
 <?php
-require_once "../../config/database.php";
-require_once "../../controllers/EstudianteController.php";
+require_once '../../controllers/estudianteController.php';
+$controller = new EstudianteController();
 
-if ($_POST) {
-    $database = new Database();
-    $db = $database->conectar();
-    $controller = new EstudianteController($db);
-
-    if ($controller->registrar($_POST)) {
-        echo "<script>alert('✅ Estudiante registrado con éxito'); window.location='listar.php';</script>";
-    } else {
-        echo "<script>alert('❌ Error al registrar estudiante');</script>";
-    }
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $mensaje = $controller->registrar($_POST['codigo'], $_POST['nombre'], $_POST['email'], $_POST['programa']);
 }
 ?>
 
-<h2>Registrar Estudiante</h2>
-<form method="POST">
-    <label>Código:</label><br>
-    <input type="text" name="codigo" required><br><br>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrar Estudiante</title>
+    <link rel="stylesheet" href="../../assets/estilos.css">
+</head>
+<body>
+    <h2>➕ Registrar Estudiante</h2>
+    <form method="POST">
+        <label>Código:</label>
+        <input type="text" name="codigo" required><br>
+        <label>Nombre:</label>
+        <input type="text" name="nombre" required><br>
+        <label>Email:</label>
+        <input type="email" name="email" required><br>
+        <label>Programa:</label>
+        <input type="text" name="programa" required><br>
+        <button type="submit">Guardar</button>
+        <label>Programa de Formación:</label>
+        <select name="programa" required>
+        <option value="">Seleccione un programa</option>
+        <?php
+        require_once '../../models/drivers/conexDB.php';
+        $db = new conexDB();
+        $conn = $db->getConexion();
+        $programas = $conn->query("SELECT codigo, nombre FROM programas");
+        while ($prog = $programas->fetch_assoc()) {
+            echo "<option value='{$prog['codigo']}'>{$prog['nombre']}</option>";
+        }
+        ?>
+        </select><br>
 
-    <label>Nombre:</label><br>
-    <input type="text" name="nombre" required><br><br>
+    </form>
 
-    <label>Correo:</label><br>
-    <input type="email" name="correo" required><br><br>
+    <?php if (!empty($mensaje)): ?>
+        <p><?= $mensaje ?></p>
+    <?php endif; ?>
 
-    <label>ID Programa (opcional):</label><br>
-    <input type="number" name="id_programa"><br><br>
-
-    <button type="submit">Guardar</button>
-</form>
+    <a href="consultar.php">⬅ Volver</a>
+</body>
+</html>

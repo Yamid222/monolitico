@@ -1,77 +1,38 @@
 <?php
-require_once "models/Estudiante.php";
+namespace app\controllers;
 
+use app\models\entities\Estudiante;   // 🔹 Importa la clase Estudiante
+use app\models\drivers\conexDB;       // 🔹 (Opcional si también usas la conexión aquí)
+
+require_once __DIR__ . '/../models/entities/estudiante.php';  // 🔹 Incluye la clase
+require_once __DIR__ . '/../models/drivers/conexDB.php';
+       // 🔹 Incluye la conexión
+       
 class EstudianteController {
-    private $db;
+    private $model;
 
-    public function __construct($db) {
-        $this->db = $db;
+    public function __construct() {
+        $this->model = new Estudiante();
     }
 
-    public function consultar() {
-        $estudiante = new Estudiante($this->db);
-        return $estudiante->listar();
+    public function listar() {
+        return $this->model->listar();
     }
 
-    public function obtenerPorId($id) {
-        $estudiante = new Estudiante($this->db);
-        return $estudiante->obtenerPorId($id);
+    public function registrar($codigo, $nombre, $email, $programa) {
+        return $this->model->registrar($codigo, $nombre, $email, $programa);
     }
 
-    public function obtenerPorCodigo($codigo) {
-        $estudiante = new Estudiante($this->db);
-        return $estudiante->obtenerPorCodigo($codigo);
+    public function actualizar($codigo, $nombre, $email) {
+        return $this->model->actualizar($codigo, $nombre, $email);
     }
 
-    public function consultarPorPrograma($codigo_programa) {
-        $estudiante = new Estudiante($this->db);
-        return $estudiante->listarPorProgramaCodigo($codigo_programa);
+    public function eliminar($codigo) {
+        return $this->model->eliminar($codigo);
     }
 
-    public function registrar($data) {
-        $estudiante = new Estudiante($this->db);
-        $estudiante->codigo = $data['codigo'];
-        $estudiante->nombre = $data['nombre'];
-        $estudiante->correo = $data['correo'];
-        $estudiante->id_programa = $data['id_programa'] ?? null;
-
-        return $estudiante->crear();
-    }
-
-    public function modificar($id, $data) {
-        $estudiante = new Estudiante($this->db);
-        $estudiante->id_estudiante = $id;
-        
-        // Verificar si el estudiante tiene notas antes de modificar
-        if ($estudiante->tieneNotas()) {
-            return ['success' => false, 'message' => 'No se puede modificar el estudiante porque tiene notas registradas'];
-        }
-
-        $estudiante->nombre = $data['nombre'];
-        $estudiante->correo = $data['correo'];
-        $estudiante->id_programa = $data['id_programa'];
-        
-        if ($estudiante->actualizar()) {
-            return ['success' => true, 'message' => 'Estudiante actualizado correctamente'];
-        } else {
-            return ['success' => false, 'message' => 'Error al actualizar el estudiante'];
-        }
-    }
-
-    public function eliminar($id) {
-        $estudiante = new Estudiante($this->db);
-        $estudiante->id_estudiante = $id;
-        
-        // Verificar si el estudiante tiene notas antes de eliminar
-        if ($estudiante->tieneNotas()) {
-            return ['success' => false, 'message' => 'No se puede eliminar el estudiante porque tiene notas registradas'];
-        }
-        
-        if ($estudiante->eliminar()) {
-            return ['success' => true, 'message' => 'Estudiante eliminado correctamente'];
-        } else {
-            return ['success' => false, 'message' => 'Error al eliminar el estudiante'];
-        }
+    public function buscarPorCodigo($codigo) {
+        return $this->model->buscarPorCodigo($codigo);
     }
 }
 ?>
