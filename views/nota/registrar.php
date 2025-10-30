@@ -13,14 +13,15 @@ if (!isset($_GET['estudiante'])) {
     exit;
 }
 
-$estudiante = $estudianteController->obtenerPorId($_GET['estudiante']);
+$estudiante = $estudianteController->obtenerPorCodigo($_GET['estudiante']);
 $materias = $notaController->obtenerMateriasDisponibles($_GET['estudiante']);
 
 $errorMessage = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $resultado = $notaController->registrar([
-        'id_estudiante' => $_GET['estudiante'],
-        'id_materia' => $_POST['id_materia'] ?? null,
+        'estudiante' => $_GET['estudiante'],
+        'materia' => $_POST['materia'] ?? null,
+        'actividad' => $_POST['actividad'] ?? 'Actividad',
         'valor' => $_POST['valor'] ?? null
     ]);
 
@@ -38,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="utf-8">
     <title>Registrar Nota</title>
-    <link rel="stylesheet" href="/assets/css/styles.css">
+    <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
 <body>
     <div class="container">
@@ -52,10 +53,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form method="POST" class="form-container">
             <div class="form-group">
                 <label>Materia:</label>
-                <select name="id_materia" required>
+                <select name="materia" required>
                     <option value="">Seleccione una materia</option>
                     <?php while ($materia = $materias->fetch(PDO::FETCH_ASSOC)) : ?>
-                        <option value="<?php echo $materia['id_materia']; ?>" <?php if (isset($_POST['id_materia']) && $_POST['id_materia'] == $materia['id_materia']) echo 'selected'; ?>>
+                        <option value="<?php echo $materia['codigo']; ?>" <?php if (isset($_POST['materia']) && $_POST['materia'] == $materia['codigo']) echo 'selected'; ?>>
                             <?php echo htmlspecialchars($materia['codigo'] . ' - ' . $materia['nombre']); ?>
                         </option>
                     <?php endwhile; ?>
@@ -63,11 +64,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <div class="form-group">
+                <label>Actividad:</label>
+                <input type="text" name="actividad" maxlength="50" value="<?php echo isset($_POST['actividad']) ? htmlspecialchars($_POST['actividad']) : 'Actividad'; ?>">
+            </div>
+            <div class="form-group">
                 <label>Nota (0.00 - 5.00):</label>
-                <input type="number" name="valor" step="0.01" min="0" max="5" required value="<?php echo isset($_POST['valor']) ? htmlspecialchars($_POST['valor']) : ''; ?>">
+                <input type="number" name="valor" step="0.01" min="0.01" max="5" required value="<?php echo isset($_POST['valor']) ? htmlspecialchars($_POST['valor']) : ''; ?>">
             </div>
 
-            <div class="form-group buttons">
+            <div class="btn-group">
                 <button type="submit" class="btn btn-primary">Guardar</button>
                 <a href="consultar.php?estudiante=<?php echo $_GET['estudiante']; ?>" class="btn btn-secondary">Cancelar</a>
             </div>

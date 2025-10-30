@@ -9,34 +9,47 @@ $estudiantes = $controller->listar();
 <head>
     <meta charset="UTF-8">
     <title>Consultar Estudiantes</title>
+    <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
 <body>
-    <h1>Lista de Estudiantes</h1>
+    <div class="container">
+        <h1>Lista de Estudiantes</h1>
 
-    <table border="1" cellpadding="10">
-        <tr>
-            <th>Código</th>
-            <th>Nombre</th>
-            <th>Correo</th>
-            <th>Programa</th>
-            <th>Acciones</th>
-        </tr>
+        <div class="btn-group mb-2">
+            <a href="registrar.php" class="btn btn-primary">➕ Registrar Estudiante</a>
+        </div>
 
-        <?php foreach ($estudiantes as $fila): ?>
-            <tr>
-                <td><?= $fila['codigo'] ?></td>
-                <td><?= $fila['nombre'] ?></td>
-                <td><?= $fila['correo'] ?></td>
-                <td><?= $fila['id_programa'] ?></td>
-                <td>
-                    <a href="editar.php?codigo=<?= $fila['codigo'] ?>">✏️ Editar</a> |
-                    <a href="eliminar.php?codigo=<?= $fila['codigo'] ?>"
-                       onclick="return confirm('¿Seguro que deseas eliminar este estudiante?');">
-                       🗑️ Eliminar
-                    </a>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-    </table>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Programa</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($fila = $estudiantes->fetch(PDO::FETCH_ASSOC)) : ?>
+                    <tr>
+                        <td><?= htmlspecialchars($fila['codigo']) ?></td>
+                        <td><?= htmlspecialchars($fila['nombre']) ?></td>
+                        <td><?= htmlspecialchars($fila['email']) ?></td>
+                        <td><?= htmlspecialchars($fila['programa']) ?></td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="modificar.php?codigo=<?= urlencode($fila['codigo']) ?>" class="btn btn-small btn-secondary">Editar</a>
+                                <a href="eliminar.php?codigo=<?= urlencode($fila['codigo']) ?>" class="btn btn-small btn-danger" onclick="return confirm('¿Seguro que deseas eliminar este estudiante?');">Eliminar</a>
+                            </div>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+
+        <div class="btn-group mt-3">
+            <a href="../../index.html" class="btn btn-secondary">Volver al Inicio</a>
+        </div>
+    </div>
 </body>
 </html>

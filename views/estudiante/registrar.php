@@ -1,6 +1,12 @@
 <?php
+require_once '../../config/database.php';
 require_once '../../controllers/estudianteController.php';
+require_once '../../controllers/programaController.php';
+
+$db = (new Database())->conectar();
 $controller = new EstudianteController();
+$programaController = new ProgramaController($db);
+$programas = $programaController->consultar();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $mensaje = $controller->registrar($_POST['codigo'], $_POST['nombre'], $_POST['email'], $_POST['programa']);
@@ -12,40 +18,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <title>Registrar Estudiante</title>
-    <link rel="stylesheet" href="../../assets/estilos.css">
+    <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
 <body>
-    <h2>➕ Registrar Estudiante</h2>
-    <form method="POST">
-        <label>Código:</label>
-        <input type="text" name="codigo" required><br>
-        <label>Nombre:</label>
-        <input type="text" name="nombre" required><br>
-        <label>Email:</label>
-        <input type="email" name="email" required><br>
-        <label>Programa:</label>
-        <input type="text" name="programa" required><br>
-        <button type="submit">Guardar</button>
-        <label>Programa de Formación:</label>
-        <select name="programa" required>
-        <option value="">Seleccione un programa</option>
-        <?php
-        require_once '../../models/drivers/conexDB.php';
-        $db = new conexDB();
-        $conn = $db->getConexion();
-        $programas = $conn->query("SELECT codigo, nombre FROM programas");
-        while ($prog = $programas->fetch_assoc()) {
-            echo "<option value='{$prog['codigo']}'>{$prog['nombre']}</option>";
-        }
-        ?>
-        </select><br>
+    <div class="container">
+        <h2>➕ Registrar Estudiante</h2>
+        <form method="POST" class="form-container">
+            <div class="form-group">
+                <label>Código:</label>
+                <input type="text" name="codigo" required>
+            </div>
+            <div class="form-group">
+                <label>Nombre:</label>
+                <input type="text" name="nombre" required>
+            </div>
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label>Programa de Formación:</label>
+                <select name="programa" required>
+                    <option value="">Seleccione un programa</option>
+                    <?php while ($prog = $programas->fetch(PDO::FETCH_ASSOC)) : ?>
+                        <option value="<?php echo $prog['codigo']; ?>"><?php echo $prog['codigo'] . ' - ' . $prog['nombre']; ?></option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
 
-    </form>
+            <div class="btn-group">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <a href="consultar.php" class="btn btn-secondary">Volver</a>
+            </div>
+        </form>
 
-    <?php if (!empty($mensaje)): ?>
-        <p><?= $mensaje ?></p>
-    <?php endif; ?>
-
-    <a href="consultar.php">⬅ Volver</a>
+        <?php if (!empty($mensaje)): ?>
+            <div class="alert alert-success"><?= $mensaje ?></div>
+        <?php endif; ?>
+    </div>
 </body>
 </html>

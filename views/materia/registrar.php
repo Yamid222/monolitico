@@ -16,7 +16,6 @@ if ($_POST) {
     }
 }
 
-// Obtener lista de programas para el select
 $programaController = new ProgramaController($db);
 $programas = $programaController->consultar();
 ?>
@@ -25,28 +24,37 @@ $programas = $programaController->consultar();
 <html>
 <head>
     <title>Registrar Materia</title>
+    <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
 <body>
-    <h2>Registrar Materia</h2>
-    <form method="POST">
-        <label>Código:</label><br>
-        <input type="text" name="codigo" required><br><br>
+    <div class="container">
+        <h2>Registrar Materia</h2>
+        <form method="POST" class="form-container">
+            <div class="form-group">
+                <label>Código:</label>
+                <input type="text" name="codigo" required>
+            </div>
 
-        <label>Nombre:</label><br>
-        <input type="text" name="nombre" required><br><br>
+            <div class="form-group">
+                <label>Nombre:</label>
+                <input type="text" name="nombre" required>
+            </div>
 
-        <label>Programa:</label><br>
-        <select name="id_programa" required>
-            <option value="">Seleccione un programa</option>
-            <?php while ($programa = $programas->fetch(PDO::FETCH_ASSOC)) : ?>
-                <option value="<?php echo $programa['id_programa']; ?>">
-                    <?php echo $programa['nombre']; ?>
-                </option>
-            <?php endwhile; ?>
-        </select><br><br>
+            <div class="form-group">
+                <label>Programa:</label>
+                <select name="programa" required>
+                    <option value="">Seleccione un programa</option>
+                    <?php while ($programa = $programas->fetch(PDO::FETCH_ASSOC)) : ?>
+                        <option value="<?php echo $programa['codigo']; ?>"><?php echo $programa['codigo'] . ' - ' . $programa['nombre']; ?></option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
 
-        <button type="submit">Guardar</button>
-        <a href="consultar.php"><button type="button">Volver</button></a>
-    </form>
+            <div class="btn-group">
+                <button type="submit" class="btn">Guardar</button>
+                <a href="consultar.php"><button type="button" class="btn">Volver</button></a>
+            </div>
+        </form>
+    </div>
 </body>
 </html>

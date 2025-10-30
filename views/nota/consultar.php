@@ -8,12 +8,11 @@ $db = $database->conectar();
 $notaController = new NotaController($db);
 $estudianteController = new EstudianteController($db);
 
-// Obtener estudiante seleccionado o lista de estudiantes
 $estudiante = null;
-$estudiantes = $estudianteController->consultar();
+$estudiantes = $estudianteController->listar();
 
-if (isset($_GET['estudiante'])) {
-    $estudiante = $estudianteController->obtenerPorId($_GET['estudiante']);
+if (isset($_GET['estudiante']) && $_GET['estudiante'] !== '') {
+    $estudiante = $estudianteController->obtenerPorCodigo($_GET['estudiante']);
     $notas = $notaController->consultarPorEstudiante($_GET['estudiante']);
 }
 ?>
@@ -22,21 +21,20 @@ if (isset($_GET['estudiante'])) {
 <html>
 <head>
     <title>Consultar Notas</title>
-        <link rel="stylesheet" href="/assets/css/styles.css">
+        <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
 <body>
     <div class="container">
         <h2>Notas de Estudiantes</h2>
 
-    <!-- Selector de estudiante -->
         <form method="GET" class="form-container">
             <div class="form-group">
         <label>Seleccione un Estudiante:</label>
         <select name="estudiante" onchange="this.form.submit()">
             <option value="">Seleccione...</option>
             <?php while ($est = $estudiantes->fetch(PDO::FETCH_ASSOC)) : ?>
-                        <option value="<?php echo $est['id_estudiante']; ?>"
-                                <?php if(isset($_GET['estudiante']) && $_GET['estudiante'] == $est['id_estudiante']) echo 'selected'; ?>>
+                        <option value="<?php echo $est['codigo']; ?>"
+                                <?php if(isset($_GET['estudiante']) && $_GET['estudiante'] == $est['codigo']) echo 'selected'; ?>>
                     <?php echo $est['codigo'] . ' - ' . $est['nombre']; ?>
                 </option>
             <?php endwhile; ?>
@@ -46,8 +44,8 @@ if (isset($_GET['estudiante'])) {
 
     <?php if ($estudiante) : ?>
         <h3>Estudiante: <?php echo $estudiante['nombre']; ?> (<?php echo $estudiante['codigo']; ?>)</h3>
-            <div class="button-group">
-                <a href="registrar.php?estudiante=<?php echo $estudiante['id_estudiante']; ?>" class="btn btn-primary">
+            <div class="btn-group">
+                <a href="registrar.php?estudiante=<?php echo $estudiante['codigo']; ?>" class="btn btn-primary">
                     Registrar Nueva Nota
                 </a>
             </div>
@@ -69,19 +67,20 @@ if (isset($_GET['estudiante'])) {
                         <tr>
                             <td><?php echo $materia['codigo_materia'] . ' - ' . $materia['materia']; ?></td>
                             <td>
-                                <?php 
-                                foreach ($materia['notas'] as $nota) {
-                                    echo number_format($nota['valor'], 2) . ' ';
-                                        echo "<div class='action-links'>";
-                                        echo "<a href='modificar.php?id=" . $nota['id_nota'] . "' class='btn btn-small btn-secondary'>Editar</a> ";
-                                        echo "<a href='eliminar.php?id=" . $nota['id_nota'] . "' class='btn btn-small btn-danger' onclick='return confirm(\"¿Está seguro?\")'>Eliminar</a>";
-                                        echo "</div>";
-                                }
-                                ?>
+                                <?php foreach ($materia['notas'] as $nota) : ?>
+                                    <div class="note-item">
+                                        <span><?php echo htmlspecialchars($nota['actividad']); ?>:</span>
+                                        <span class="note-valor"><?php echo number_format($nota['valor'], 2); ?></span>
+                                        <div class="btn-group">
+                                            <a href="modificar.php?estudiante=<?php echo urlencode($estudiante['codigo']); ?>&materia=<?php echo urlencode($materia['codigo_materia']); ?>&actividad=<?php echo urlencode($nota['actividad']); ?>" class="btn btn-small btn-secondary">Editar</a>
+                                            <a href="eliminar.php?estudiante=<?php echo urlencode($estudiante['codigo']); ?>&materia=<?php echo urlencode($materia['codigo_materia']); ?>&actividad=<?php echo urlencode($nota['actividad']); ?>" class="btn btn-small btn-danger" onclick="return confirm('¿Está seguro?')">Eliminar</a>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
                             </td>
                             <td class="promedio"><?php echo number_format($materia['promedio'], 2); ?></td>
                             <td>
-                                    <a href="registrar.php?estudiante=<?php echo $estudiante['id_estudiante']; ?>&id_materia=<?php echo $materia['id_materia']; ?>" class="btn btn-primary">
+                                    <a href="registrar.php?estudiante=<?php echo $estudiante['codigo']; ?>&materia=<?php echo $materia['codigo_materia']; ?>" class="btn btn-primary">
                                         Agregar Nota
                                 </a>
                             </td>
@@ -92,7 +91,7 @@ if (isset($_GET['estudiante'])) {
         <?php endif; ?>
     <?php endif; ?>
     <br>
-        <a href="../../index.php" class="btn btn-secondary">Volver al Inicio</a>
+        <a href="../../index.html" class="btn btn-secondary">Volver al Inicio</a>
     </div>
 </body>
 </html>

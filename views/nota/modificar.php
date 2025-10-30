@@ -6,15 +6,38 @@ $database = new Database();
 $db = $database->conectar();
 $controller = new NotaController($db);
 
-if (!isset($_GET['id'])) {
+if (!isset($_GET['estudiante'], $_GET['materia'], $_GET['actividad'])) {
     header("Location: consultar.php");
     exit;
 }
 
-$nota = $controller->obtenerPorId($_GET['id']);
+$sql = "SELECT e.codigo AS id_estudiante, e.nombre AS nombre_estudiante,
+               m.codigo AS id_materia, m.nombre AS nombre_materia,
+               n.actividad, n.nota AS valor
+        FROM notas n
+        JOIN estudiantes e ON e.codigo = n.estudiante
+        JOIN materias m ON m.codigo = n.materia
+        WHERE n.estudiante = :est AND n.materia = :mat AND n.actividad = :act";
+$st = $db->prepare($sql);
+$st->bindParam(':est', $_GET['estudiante']);
+$st->bindParam(':mat', $_GET['materia']);
+$st->bindParam(':act', $_GET['actividad']);
+$st->execute();
+$nota = $st->fetch(PDO::FETCH_ASSOC);
+
+if (!$nota) {
+    echo "<script>alert('❌ Nota no encontrada'); window.location='consultar.php';</script>";
+    exit;
+}
 
 if ($_POST) {
-    $resultado = $controller->modificar($_GET['id'], $_POST);
+    $data = [
+        'estudiante' => $_GET['estudiante'],
+        'materia'    => $_GET['materia'],
+        'actividad'  => $_GET['actividad'],
+        'valor'      => $_POST['valor']
+    ];
+    $resultado = $controller->modificar($data);
     if ($resultado['success']) {
         echo "<script>alert('✅ " . $resultado['message'] . "'); window.location='consultar.php?estudiante=" . $nota['id_estudiante'] . "';</script>";
     } else {
@@ -27,7 +50,7 @@ if ($_POST) {
 <html>
 <head>
     <title>Modificar Nota</title>
-        <link rel="stylesheet" href="/assets/css/styles.css">
+        <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
 <body>
     <div class="container">

@@ -8,12 +8,10 @@ $db = $database->conectar();
 $materiaController = new MateriaController($db);
 $programaController = new ProgramaController($db);
 
-// Filtrar por programa si se proporciona un ID
 $materias = isset($_GET['programa']) ? 
     $materiaController->consultarPorPrograma($_GET['programa']) : 
     $materiaController->consultar();
 
-// Obtener lista de programas para el filtro
 $programas = $programaController->consultar();
 ?>
 
@@ -21,59 +19,59 @@ $programas = $programaController->consultar();
 <html>
 <head>
     <title>Consultar Materias</title>
+    <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
 <body>
-    <h2>Materias</h2>
+    <div class="container">
+        <h2>Materias</h2>
 
-    <!-- Filtro por programa -->
-    <form method="GET">
-        <label>Filtrar por Programa:</label>
-        <select name="programa" onchange="this.form.submit()">
-            <option value="">Todos los programas</option>
-            <?php while ($prog = $programas->fetch(PDO::FETCH_ASSOC)) : ?>
-                <option value="<?php echo $prog['id_programa']; ?>"
-                        <?php if(isset($_GET['programa']) && $_GET['programa'] == $prog['id_programa']) echo 'selected'; ?>>
-                    <?php echo $prog['nombre']; ?>
-                </option>
-            <?php endwhile; ?>
-        </select>
-    </form>
-    <br>
+        <form method="GET" class="form-container">
+            <div class="form-group">
+                <label>Filtrar por Programa:</label>
+                <select name="programa" onchange="this.form.submit()">
+                    <option value="">Todos los programas</option>
+                    <?php while ($prog = $programas->fetch(PDO::FETCH_ASSOC)) : ?>
+                        <option value="<?php echo $prog['codigo']; ?>" <?php if(isset($_GET['programa']) && $_GET['programa'] == $prog['codigo']) echo 'selected'; ?>>
+                            <?php echo $prog['codigo'] . ' - ' . $prog['nombre']; ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+        </form>
 
-    <a href="registrar.php"><button>Nueva Materia</button></a>
-    <br><br>
+        <div class="btn-group mb-2">
+            <a href="registrar.php" class="btn btn-primary">➕ Nueva Materia</a>
+        </div>
 
-    <table border="1">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Código</th>
-                <th>Nombre</th>
-                <th>Programa</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php while ($row = $materias->fetch(PDO::FETCH_ASSOC)) : ?>
+        <table class="data-table">
+            <thead>
                 <tr>
-                    <td><?php echo $row['id_materia']; ?></td>
-                    <td><?php echo $row['codigo']; ?></td>
-                    <td><?php echo $row['nombre']; ?></td>
-                    <td><?php echo $row['nombre_programa']; ?></td>
-                    <td>
-                        <a href="modificar.php?id=<?php echo $row['id_materia']; ?>">
-                            <button>Modificar</button>
-                        </a>
-                        <a href="eliminar.php?id=<?php echo $row['id_materia']; ?>" 
-                           onclick="return confirm('¿Está seguro de eliminar esta materia?')">
-                            <button>Eliminar</button>
-                        </a>
-                    </td>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Programa</th>
+                    <th>Acciones</th>
                 </tr>
-            <?php endwhile; ?>
-        </tbody>
-    </table>
-    <br>
-    <a href="../../index.php"><button>Volver al Inicio</button></a>
+            </thead>
+            <tbody>
+                <?php while ($row = $materias->fetch(PDO::FETCH_ASSOC)) : ?>
+                    <tr>
+                        <td><?php echo $row['codigo']; ?></td>
+                        <td><?php echo $row['nombre']; ?></td>
+                        <td><?php echo $row['nombre_programa']; ?></td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="modificar.php?codigo=<?php echo $row['codigo']; ?>" class="btn btn-small btn-secondary">Editar</a>
+                                <a href="eliminar.php?codigo=<?php echo $row['codigo']; ?>" class="btn btn-small btn-danger" onclick="return confirm('¿Está seguro de eliminar esta materia?')">Eliminar</a>
+                            </div>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+
+        <div class="btn-group mt-3">
+            <a href="../../index.html" class="btn btn-secondary">Volver al Inicio</a>
+        </div>
+    </div>
 </body>
 </html>

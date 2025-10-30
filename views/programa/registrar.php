@@ -20,18 +20,27 @@ if ($_POST) {
 <html>
 <head>
     <title>Registrar Programa de Formación</title>
+    <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
 <body>
-    <h2>Registrar Programa de Formación</h2>
-    <form method="POST">
-        <label>Código:</label><br>
-        <input type="text" name="codigo" required><br><br>
+    <div class="container">
+        <h2>Registrar Programa de Formación</h2>
+        <form method="POST" class="form-container">
+            <div class="form-group">
+                <label>Código:</label>
+                <input type="text" name="codigo" required>
+            </div>
 
-        <label>Nombre:</label><br>
-        <input type="text" name="nombre" required><br><br>
+            <div class="form-group">
+                <label>Nombre:</label>
+                <input type="text" name="nombre" required>
+            </div>
 
-        <button type="submit">Guardar</button>
-        <a href="consultar.php"><button type="button">Volver</button></a>
-    </form>
+            <div class="btn-group">
+                <button type="submit" class="btn">Guardar</button>
+                <a href="consultar.php" class="btn">Volver</a>
+            </div>
+        </form>
+    </div>
 </body>
 </html>

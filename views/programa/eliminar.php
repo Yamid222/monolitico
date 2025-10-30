@@ -6,12 +6,14 @@ $database = new Database();
 $db = $database->conectar();
 $controller = new ProgramaController($db);
 
-if (isset($_GET['id'])) {
-    $resultado = $controller->eliminar($_GET['id']);
-    if ($resultado['success']) {
+if (isset($_GET['codigo'])) {
+    $codigo = $_GET['codigo'];
+    $resultado = $controller->eliminar($codigo);
+    if (!empty($resultado['success']) && $resultado['success'] === true) {
         echo "<script>alert('✅ " . $resultado['message'] . "'); window.location='consultar.php';</script>";
     } else {
-        echo "<script>alert('❌ " . $resultado['message'] . "'); window.location='consultar.php';</script>";
+        $msg = $resultado['message'] ?? 'No se pudo eliminar el programa.';
+        echo "<script>alert('❌ " . $msg . "'); window.location='consultar.php';</script>";
     }
 } else {
     header("Location: consultar.php");

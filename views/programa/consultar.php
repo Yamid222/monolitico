@@ -12,40 +12,43 @@ $programas = $controller->consultar();
 <html>
 <head>
     <title>Consultar Programas de Formación</title>
+    <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
 <body>
-    <h2>Programas de Formación</h2>
-    <a href="registrar.php"><button>Nuevo Programa</button></a>
-    <br><br>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Código</th>
-                <th>Nombre</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php while ($row = $programas->fetch(PDO::FETCH_ASSOC)) : ?>
+    <div class="container">
+        <h2>Programas de Formación</h2>
+
+        <div class="btn-group mb-2">
+            <a href="registrar.php" class="btn btn-primary">➕ Nuevo Programa</a>
+        </div>
+
+        <table class="data-table">
+            <thead>
                 <tr>
-                    <td><?php echo $row['id_programa']; ?></td>
-                    <td><?php echo $row['codigo']; ?></td>
-                    <td><?php echo $row['nombre']; ?></td>
-                    <td>
-                        <a href="modificar.php?id=<?php echo $row['id_programa']; ?>">
-                            <button>Modificar</button>
-                        </a>
-                        <a href="eliminar.php?id=<?php echo $row['id_programa']; ?>" 
-                           onclick="return confirm('¿Está seguro de eliminar este programa?')">
-                            <button>Eliminar</button>
-                        </a>
-                    </td>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Acciones</th>
                 </tr>
-            <?php endwhile; ?>
-        </tbody>
-    </table>
-    <br>
-    <a href="../../index.php"><button>Volver al Inicio</button></a>
+            </thead>
+            <tbody>
+                <?php while ($row = $programas->fetch(PDO::FETCH_ASSOC)) : ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($row['codigo']); ?></td>
+                        <td><?php echo htmlspecialchars($row['nombre']); ?></td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="modificar.php?codigo=<?php echo urlencode($row['codigo']); ?>" class="btn btn-small btn-secondary">Editar</a>
+                                <a href="eliminar.php?codigo=<?php echo urlencode($row['codigo']); ?>" class="btn btn-small btn-danger" onclick="return confirm('¿Está seguro de eliminar este programa?')">Eliminar</a>
+                            </div>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+
+        <div class="btn-group mt-3">
+            <a href="../../index.html" class="btn btn-secondary">Volver al Inicio</a>
+        </div>
+    </div>
 </body>
 </html>

@@ -3,7 +3,7 @@ require_once '../../controllers/estudianteController.php';
 $controller = new EstudianteController();
 
 $codigo = $_GET['codigo'];
-$mensaje = $controller->eliminar($codigo);
+$resultado = $controller->eliminar($codigo);
 ?>
 
 <!DOCTYPE html>
@@ -16,7 +16,19 @@ $mensaje = $controller->eliminar($codigo);
 <body>
     <h2>🗑️ Eliminar Estudiante</h2>
 
-    <p><?= $mensaje ?></p>
+    <?php if (!empty($resultado['success']) && $resultado['success'] === true): ?>
+        <p><?= htmlspecialchars($resultado['message']) ?></p>
+        <script>
+            alert('✅ <?= addslashes($resultado['message']) ?>');
+            window.location = 'consultar.php';
+        </script>
+    <?php else: ?>
+        <p><?= htmlspecialchars($resultado['message'] ?? 'No se pudo eliminar el estudiante.') ?></p>
+        <script>
+            alert('❌ <?= addslashes($resultado['message'] ?? 'No se pudo eliminar el estudiante.') ?>');
+            window.location = 'consultar.php';
+        </script>
+    <?php endif; ?>
 
     <a href="consultar.php">⬅ Volver</a>
 </body>

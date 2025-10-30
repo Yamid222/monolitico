@@ -1,11 +1,12 @@
 <?php
-require_once "models/Programa.php";
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../models/entities/programa.php';
 
 class ProgramaController {
     private $db;
 
-    public function __construct($db) {
-        $this->db = $db;
+    public function __construct($db = null) {
+        $this->db = $db ?: (new Database())->conectar();
     }
 
     public function consultar() {
@@ -25,16 +26,15 @@ class ProgramaController {
         }
     }
 
-    public function obtenerPorId($id) {
+    public function obtenerPorCodigo($codigo) {
         $programa = new Programa($this->db);
-        return $programa->obtenerPorId($id);
+        return $programa->obtenerPorCodigo($codigo);
     }
 
-    public function modificar($id, $data) {
+    public function modificar($codigo, $data) {
         $programa = new Programa($this->db);
-        $programa->id_programa = $id;
+        $programa->codigo = $codigo;
         
-        // Verificar si el programa tiene relaciones antes de modificar
         if ($programa->tieneEstudiantes() || $programa->tieneMaterias()) {
             return ['success' => false, 'message' => 'No se puede modificar el programa porque tiene estudiantes o materias relacionadas'];
         }
@@ -48,11 +48,10 @@ class ProgramaController {
         }
     }
 
-    public function eliminar($id) {
+    public function eliminar($codigo) {
         $programa = new Programa($this->db);
-        $programa->id_programa = $id;
+        $programa->codigo = $codigo;
         
-        // Verificar si el programa tiene relaciones antes de eliminar
         if ($programa->tieneEstudiantes() || $programa->tieneMaterias()) {
             return ['success' => false, 'message' => 'No se puede eliminar el programa porque tiene estudiantes o materias relacionadas'];
         }

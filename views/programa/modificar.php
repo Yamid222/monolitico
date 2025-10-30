@@ -7,7 +7,8 @@ $db = $database->conectar();
 $controller = new ProgramaController($db);
 
 if ($_POST) {
-    $resultado = $controller->modificar($_GET['id'], $_POST);
+    $codigo = $_GET['codigo'] ?? '';
+    $resultado = $controller->modificar($codigo, $_POST);
     if ($resultado['success']) {
         echo "<script>alert('✅ " . $resultado['message'] . "'); window.location='consultar.php';</script>";
     } else {
@@ -15,25 +16,35 @@ if ($_POST) {
     }
 }
 
-$programa = $controller->obtenerPorId($_GET['id']);
+$codigo = $_GET['codigo'] ?? '';
+$programa = $controller->obtenerPorCodigo($codigo);
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
     <title>Modificar Programa de Formación</title>
+    <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
 <body>
-    <h2>Modificar Programa de Formación</h2>
-    <form method="POST">
-        <label>Código:</label><br>
-        <input type="text" value="<?php echo $programa['codigo']; ?>" disabled><br><br>
+    <div class="container">
+        <h2>Modificar Programa de Formación</h2>
+        <form method="POST" class="form-container">
+            <div class="form-group">
+                <label>Código:</label>
+                <input type="text" value="<?php echo $programa['codigo']; ?>" disabled>
+            </div>
 
-        <label>Nombre:</label><br>
-        <input type="text" name="nombre" value="<?php echo $programa['nombre']; ?>" required><br><br>
+            <div class="form-group">
+                <label>Nombre:</label>
+                <input type="text" name="nombre" value="<?php echo $programa['nombre']; ?>" required>
+            </div>
 
-        <button type="submit">Guardar Cambios</button>
-        <a href="consultar.php"><button type="button">Cancelar</button></a>
-    </form>
+            <div class="btn-group">
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                <a href="consultar.php" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
 </body>
 </html>

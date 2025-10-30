@@ -1,11 +1,12 @@
 <?php
-require_once "models/Materia.php";
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../models/entities/materia.php';
 
 class MateriaController {
     private $db;
 
-    public function __construct($db) {
-        $this->db = $db;
+    public function __construct($db = null) {
+        $this->db = $db ?: (new Database())->conectar();
     }
 
     public function consultar() {
@@ -13,16 +14,16 @@ class MateriaController {
         return $materia->listar();
     }
 
-    public function consultarPorPrograma($id_programa) {
+    public function consultarPorPrograma($codigo_programa) {
         $materia = new Materia($this->db);
-        return $materia->listarPorPrograma($id_programa);
+        return $materia->listarPorPrograma($codigo_programa);
     }
 
     public function registrar($data) {
         $materia = new Materia($this->db);
         $materia->codigo = $data['codigo'];
         $materia->nombre = $data['nombre'];
-        $materia->id_programa = $data['id_programa'];
+        $materia->programa = $data['programa'];
 
         if ($materia->crear()) {
             return ['success' => true, 'message' => 'Materia registrada correctamente'];
@@ -31,22 +32,21 @@ class MateriaController {
         }
     }
 
-    public function obtenerPorId($id) {
+    public function obtenerPorCodigo($codigo) {
         $materia = new Materia($this->db);
-        return $materia->obtenerPorId($id);
+        return $materia->obtenerPorCodigo($codigo);
     }
 
-    public function modificar($id, $data) {
+    public function modificar($codigo, $data) {
         $materia = new Materia($this->db);
-        $materia->id_materia = $id;
+        $materia->codigo = $codigo;
         
-        // Verificar si la materia tiene notas antes de modificar
-        if ($materia->tieneNotas()) {
-            return ['success' => false, 'message' => 'No se puede modificar la materia porque tiene notas registradas'];
+        if ($materia->bloqueadaPorRelacion()) {
+            return ['success' => false, 'message' => 'No se puede modificar la materia porque tiene notas o estudiantes relacionados'];
         }
 
         $materia->nombre = $data['nombre'];
-        $materia->id_programa = $data['id_programa'];
+        $materia->programa = $data['programa'];
         
         if ($materia->actualizar()) {
             return ['success' => true, 'message' => 'Materia actualizada correctamente'];
@@ -55,13 +55,12 @@ class MateriaController {
         }
     }
 
-    public function eliminar($id) {
+    public function eliminar($codigo) {
         $materia = new Materia($this->db);
-        $materia->id_materia = $id;
+        $materia->codigo = $codigo;
         
-        // Verificar si la materia tiene notas antes de eliminar
-        if ($materia->tieneNotas()) {
-            return ['success' => false, 'message' => 'No se puede eliminar la materia porque tiene notas registradas'];
+        if ($materia->bloqueadaPorRelacion()) {
+            return ['success' => false, 'message' => 'No se puede eliminar la materia porque tiene notas o estudiantes relacionados'];
         }
         
         if ($materia->eliminar()) {
