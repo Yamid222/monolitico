@@ -15,11 +15,18 @@ class Programa {
     }
 
     public function crear() {
+        try {
         $query = "INSERT INTO programas (codigo, nombre) VALUES (:codigo, :nombre)";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':codigo', $this->codigo);
         $stmt->bindParam(':nombre', $this->nombre);
         return $stmt->execute();
+        } catch (PDOException $e) {
+            if ($e->getCode() === '23000') {
+                return false;
+            }
+            throw $e;
+        }
     }
 
     public function obtenerPorCodigo($codigo) {

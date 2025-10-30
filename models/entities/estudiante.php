@@ -15,13 +15,34 @@ class Estudiante {
     }
 
     public function registrar($codigo, $nombre, $email, $programa) {
-        $stmt = $this->conn->prepare("INSERT INTO estudiantes (codigo, nombre, email, programa)
+        $codigo = trim($codigo);
+        $nombre = trim($nombre);
+        $email = trim($email);
+        $programa = trim($programa);
+
+        $check = $this->conn->prepare("SELECT COUNT(*) AS total FROM estudiantes WHERE codigo = :codigo");
+        $check->bindParam(':codigo', $codigo);
+        $check->execute();
+        $exists = $check->fetch(PDO::FETCH_ASSOC);
+        if ($exists && (int)$exists['total'] > 0) {
+            return 'Ya existe un estudiante con ese código.';
+        }
+
+        try {
+            $stmt = $this->conn->prepare("INSERT INTO estudiantes (codigo, nombre, email, programa)
                                       VALUES (:codigo, :nombre, :email, :programa)");
-        $stmt->bindParam(':codigo', $codigo);
-        $stmt->bindParam(':nombre', $nombre);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':programa', $programa);
-        return $stmt->execute();
+            $stmt->bindParam(':codigo', $codigo);
+            $stmt->bindParam(':nombre', $nombre);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':programa', $programa);
+            $ok = $stmt->execute();
+            return $ok ? 'Estudiante registrado correctamente.' : 'Error al registrar estudiante.';
+        } catch (PDOException $e) {
+            if ($e->getCode() === '23000') {
+                return 'Ya existe un estudiante con ese código.';
+            }
+            return 'Error al registrar estudiante.';
+        }
     }
 
     public function listarPorPrograma($codigo_programa) {

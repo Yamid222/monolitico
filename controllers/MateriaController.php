@@ -21,6 +21,12 @@ class MateriaController {
 
     public function registrar($data) {
         $materia = new Materia($this->db);
+        // Verificar si el código ya existe antes de crear
+        $existente = $materia->obtenerPorCodigo($data['codigo']);
+        if ($existente) {
+            return ['success' => false, 'message' => 'El código de la materia ya existe'];
+        }
+
         $materia->codigo = $data['codigo'];
         $materia->nombre = $data['nombre'];
         $materia->programa = $data['programa'];

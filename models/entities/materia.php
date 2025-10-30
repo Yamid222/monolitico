@@ -37,7 +37,11 @@ class Materia {
         $stmt->bindParam(':codigo', $this->codigo);
         $stmt->bindParam(':nombre', $this->nombre);
         $stmt->bindParam(':programa', $this->programa);
-        return $stmt->execute();
+        try {
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            return false;
+        }
     }
 
     public function obtenerPorCodigo($codigo) {

@@ -19,6 +19,11 @@ class ProgramaController {
         $programa->codigo = $data['codigo'];
         $programa->nombre = $data['nombre'];
 
+        // Verificar si ya existe un programa con el mismo código
+        if ($programa->obtenerPorCodigo($programa->codigo)) {
+            return ['success' => false, 'message' => 'El código ya existe'];
+        }
+
         if ($programa->crear()) {
             return ['success' => true, 'message' => 'Programa registrado correctamente'];
         } else {
