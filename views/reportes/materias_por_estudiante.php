@@ -22,46 +22,10 @@ $estudiantes = $programa_seleccionado
 <html>
 <head>
     <title>Materias por Estudiante</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .filtros { margin-bottom: 20px; }
-        .estudiante-section { 
-            margin-bottom: 30px; 
-            padding: 15px;
-            background-color: #f5f5f5;
-            border-radius: 5px;
-        }
-        table { 
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        th, td { 
-            padding: 8px;
-            text-align: left;
-            border: 1px solid #ddd;
-        }
-        th { background-color: #007bff; color: white; }
-        tr:nth-child(even) { background-color: #f2f2f2; }
-        .volver { margin-top: 20px; }
-        button, select {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-        }
-        select { 
-            background-color: white;
-            color: black;
-            border: 1px solid #ddd;
-        }
-        button:hover { background-color: #0056b3; }
-        .promedio { font-weight: bold; }
-    </style>
+    <link rel="stylesheet" href="/assets/css/styles.css">
 </head>
 <body>
+    <body class="reportes-materias">
     <h1>Materias por Estudiante</h1>
 
     <div class="filtros">
@@ -88,13 +52,13 @@ $estudiantes = $programa_seleccionado
             <div class="estudiante-section">
                 <h2><?php echo $estudiante['codigo'] . ' - ' . $estudiante['nombre']; ?></h2>
                 <?php if ($materias_disponibles && $materias_disponibles->rowCount() > 0) : ?>
-                    <table>
+                    <table class="reportes-table">
                         <thead>
                             <tr>
-                                <th>Código Materia</th>
-                                <th>Materia</th>
-                                <th>Promedio</th>
-                                <th>Acciones</th>
+                                <th class="reportes-th">Código Materia</th>
+                                <th class="reportes-th">Materia</th>
+                                <th class="reportes-th">Promedio</th>
+                                <th class="reportes-th">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -104,12 +68,12 @@ $estudiantes = $programa_seleccionado
                             $promedio = isset($materias_notas[$codigo_materia]) ? $materias_notas[$codigo_materia]['promedio'] : 0;
                         ?>
                             <tr>
-                                <td><?php echo $codigo_materia; ?></td>
-                                <td><?php echo $nombre_materia; ?></td>
-                                <td class="promedio"><?php echo number_format($promedio, 2); ?></td>
-                                <td>
+                                <td class="reportes-td"><?php echo $codigo_materia; ?></td>
+                                <td class="reportes-td"><?php echo $nombre_materia; ?></td>
+                                <td class="reportes-td promedio"><?php echo number_format($promedio, 2); ?></td>
+                                <td class="reportes-td">
                                     <a href="../reportes/notas_estudiante.php?estudiante=<?php echo $estudiante['codigo']; ?>&materia=<?php echo $codigo_materia; ?>">
-                                        <button>Ver Notas</button>
+                                        <button class="btn btn-small btn-primary">Ver Notas</button>
                                     </a>
                                 </td>
                             </tr>
